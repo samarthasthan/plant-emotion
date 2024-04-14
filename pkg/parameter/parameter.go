@@ -32,9 +32,9 @@ func NewParameter() Parameter {
 }
 
 func (p *Parameter) Random() *Parameter {
-	p.SoilMoisture = rand.Intn(100-0) + 0
+	p.SoilMoisture = rand.Intn(70-60) + 60
 	p.LightIntensity = rand.Intn(1000-200) + 200
-	p.Temperature = rand.Intn(70-20) + 20
+	p.Temperature = rand.Intn(50-40) + 40
 	p.Humidity = rand.Intn(100-30) + 30
 	p.NutrientLevel = rand.Float32() + float32(rand.Intn(5-2)+2)
 	p.LeafMovement = Movement(rand.Intn(4-1) + 1)
