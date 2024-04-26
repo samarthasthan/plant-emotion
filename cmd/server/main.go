@@ -8,12 +8,12 @@ import (
 )
 
 type Parameter struct {
-	Temperature    int     `json:"Temperature"`
-	SoilMoisture   int     `json:"SoilMoisture"`
-	LightIntensity int     `json:"LightIntensity"`
-	Humidity       int     `json:"Humidity"`
+	Temperature    float32 `json:"Temperature"`
+	SoilMoisture   float32 `json:"SoilMoisture"`
+	LightIntensity float32 `json:"LightIntensity"`
+	Humidity       float32 `json:"Humidity"`
 	NutrientLevel  float32 `json:"NutrientLevel"`
-	LeafMovement   int     `json:"LeafMovement"`
+	LeafMovement   float32 `json:"LeafMovement"`
 }
 
 var upgrader = websocket.Upgrader{
@@ -70,6 +70,6 @@ func main() {
 	go broadcastParameter() // Start broadcasting loop
 
 	http.HandleFunc("/ws", handleWebSocket)
-	log.Println("WebSocket server running on port 8000...")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Println("WebSocket server running on port 1082...")
+	log.Fatal(http.ListenAndServe(":1082", nil))
 }

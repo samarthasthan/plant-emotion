@@ -13,14 +13,14 @@ function AdjustValuesPage() {
   const handleSliderChange = (field) => (event) => {
     setValues((prevValues) => ({
       ...prevValues,
-      [field]: parseInt(event.target.value),
+      [field]: parseFloat(event.target.value),
     }));
   };
 
   useEffect(() => {
     // Send updated values to the WebSocket server every second
     const interval = setInterval(() => {
-      const ws = new WebSocket("ws://vscode.samarthasthan.com:8000/ws");
+      const ws = new WebSocket("ws://vscode.samarthasthan.com:1082/ws");
       ws.onopen = () => {
         ws.send(JSON.stringify(values));
         ws.close();
@@ -40,7 +40,8 @@ function AdjustValuesPage() {
         <input
           type="range"
           min={0}
-          max={100}
+          max={40}
+          step={0.1}
           value={values.Temperature}
           onChange={handleSliderChange("Temperature")}
         />
@@ -51,6 +52,7 @@ function AdjustValuesPage() {
           type="range"
           min={0}
           max={100}
+          step={1}
           value={values.SoilMoisture}
           onChange={handleSliderChange("SoilMoisture")}
         />
@@ -60,7 +62,8 @@ function AdjustValuesPage() {
         <input
           type="range"
           min={0}
-          max={1000}
+          max={1200}
+          step={1}
           value={values.LightIntensity}
           onChange={handleSliderChange("LightIntensity")}
         />
@@ -71,6 +74,7 @@ function AdjustValuesPage() {
           type="range"
           min={0}
           max={100}
+          step={1}
           value={values.Humidity}
           onChange={handleSliderChange("Humidity")}
         />
@@ -80,7 +84,7 @@ function AdjustValuesPage() {
         <input
           type="range"
           min={0}
-          max={10}
+          max={5}
           step={0.1}
           value={values.NutrientLevel}
           onChange={handleSliderChange("NutrientLevel")}
@@ -91,7 +95,8 @@ function AdjustValuesPage() {
         <input
           type="range"
           min={0}
-          max={2}
+          max={3}
+          step={0.1}
           value={values.LeafMovement}
           onChange={handleSliderChange("LeafMovement")}
         />

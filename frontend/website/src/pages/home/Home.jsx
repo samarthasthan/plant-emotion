@@ -14,7 +14,7 @@ function Home() {
 
   useEffect(() => {
     // Establish WebSocket connection
-    const ws = new WebSocket("ws://vscode.samarthasthan.com:8000/ws");
+    const ws = new WebSocket("ws://vscode.samarthasthan.com:1082/ws");
 
     // Event listener for messages received from the WebSocket server
     ws.onmessage = (event) => {
@@ -96,6 +96,7 @@ function Home() {
   };
 
   // Function to calculate emotional state based on thresholds
+  // Function to calculate emotional state based on thresholds
   const calculateEmotionalState = () => {
     const {
       SoilMoisture,
@@ -106,87 +107,87 @@ function Home() {
       LeafMovement,
     } = chartData;
 
-    // Define thresholds
+    // Define thresholds for each sensor based on the information provided
     const thresholds = {
+      Temperature: {
+        healthy: [21, 29],
+        tooCold: [0, 21],
+        tooHot: [29, 40],
+      },
+      Humidity: {
+        healthy: [60, 70],
+        tooDry: [0, 60],
+        tooHumid: [70, 100],
+      },
       SoilMoisture: {
-        healthy: [30, 70],
-        underwatered: [0, 30],
-        overwatered: [70, 100],
+        dry: [600, 1023],
+        humid: [370, 600],
+        water: [0, 370],
       },
       LightIntensity: {
-        healthy: [400, 800],
-        tooLittleSunlight: [0, 400],
-        tooMuchSunlight: [800, 1200],
+        low: [270, 807],
+        medium: [807, 1614],
       },
-      Temperature: { healthy: [20, 30], tooCold: [0, 20], tooHot: [30, 40] },
-      Humidity: { healthy: [50, 70], tooDry: [0, 50], tooHumid: [70, 100] },
+      LeafMovement: {
+        low: [0, 1],
+        moderate: [1, 2],
+        high: [2, 3],
+      },
       NutrientLevel: {
         healthy: [2.5, 3.5],
-        nutrientDeficiency: [0, 2.5],
-        nutrientExcess: [3.5, 5],
+        deficiency: [0, 2.5],
+        excess: [3.5, 5],
       },
-      LeafMovement: { low: [0, 1], moderate: [1, 2], high: [2, 3] },
     };
 
-    // Check where each factor falls within the thresholds
+    // Determine the emotional state based on sensor readings and defined thresholds
     const emotionalState = [];
-    if (
-      SoilMoisture[SoilMoisture.length - 1] <
-      thresholds.SoilMoisture.underwatered[1]
-    ) {
-      emotionalState.push("Underwatered");
-    } else if (
-      SoilMoisture[SoilMoisture.length - 1] >
-      thresholds.SoilMoisture.overwatered[0]
-    ) {
-      emotionalState.push("Overwatered");
-    }
-    if (
-      LightIntensity[LightIntensity.length - 1] <
-      thresholds.LightIntensity.tooLittleSunlight[1]
-    ) {
-      emotionalState.push("Too little sunlight");
-    } else if (
-      LightIntensity[LightIntensity.length - 1] >
-      thresholds.LightIntensity.tooMuchSunlight[0]
-    ) {
-      emotionalState.push("Too much sunlight");
-    }
-    if (
-      Temperature[Temperature.length - 1] < thresholds.Temperature.tooCold[1]
-    ) {
+    const lastTemperature = Temperature[Temperature.length - 1];
+    const lastHumidity = Humidity[Humidity.length - 1];
+    const lastSoilMoisture = SoilMoisture[SoilMoisture.length - 1];
+    const lastLightIntensity = LightIntensity[LightIntensity.length - 1];
+    const lastLeafMovement = LeafMovement[LeafMovement.length - 1];
+    const lastNutrientLevel = NutrientLevel[NutrientLevel.length - 1];
+
+    if (lastTemperature < thresholds.Temperature.healthy[0]) {
       emotionalState.push("Too cold");
-    } else if (
-      Temperature[Temperature.length - 1] > thresholds.Temperature.tooHot[0]
-    ) {
+    } else if (lastTemperature > thresholds.Temperature.healthy[1]) {
       emotionalState.push("Too hot");
     }
-    if (Humidity[Humidity.length - 1] < thresholds.Humidity.tooDry[1]) {
+
+    if (lastHumidity < thresholds.Humidity.healthy[0]) {
       emotionalState.push("Too dry");
-    } else if (
-      Humidity[Humidity.length - 1] > thresholds.Humidity.tooHumid[0]
-    ) {
+    } else if (lastHumidity > thresholds.Humidity.healthy[1]) {
       emotionalState.push("Too humid");
     }
-    if (
-      NutrientLevel[NutrientLevel.length - 1] <
-      thresholds.NutrientLevel.nutrientDeficiency[1]
-    ) {
+
+    if (lastSoilMoisture >= thresholds.SoilMoisture.dry[0]) {
+      emotionalState.push("Dry");
+    } else if (lastSoilMoisture >= thresholds.SoilMoisture.humid[0]) {
+      emotionalState.push("Humid");
+    } else if (lastSoilMoisture < thresholds.SoilMoisture.water[0]) {
+      emotionalState.push("In water");
+    }
+
+    if (lastLightIntensity < thresholds.LightIntensity.low[1]) {
+      emotionalState.push("Low light");
+    } else if (lastLightIntensity > thresholds.LightIntensity.medium[1]) {
+      emotionalState.push("High light");
+    }
+
+    if (lastLeafMovement < thresholds.LeafMovement.moderate[0]) {
+      emotionalState.push("Low leaf movement");
+    } else if (lastLeafMovement > thresholds.LeafMovement.moderate[1]) {
+      emotionalState.push("High leaf movement");
+    }
+
+    if (lastNutrientLevel < thresholds.NutrientLevel.healthy[0]) {
       emotionalState.push("Nutrient deficiency");
-    } else if (
-      NutrientLevel[NutrientLevel.length - 1] >
-      thresholds.NutrientLevel.nutrientExcess[0]
-    ) {
+    } else if (lastNutrientLevel > thresholds.NutrientLevel.healthy[1]) {
       emotionalState.push("Nutrient excess");
     }
-    if (
-      LeafMovement[LeafMovement.length - 1] <
-        thresholds.LeafMovement.moderate[0] ||
-      LeafMovement[LeafMovement.length - 1] >
-        thresholds.LeafMovement.moderate[1]
-    ) {
-      emotionalState.push("Unhealthy");
-    } else {
+
+    if (emotionalState.length === 0) {
       emotionalState.push("Healthy");
     }
 
@@ -217,6 +218,16 @@ function Home() {
           />
         </div>
         <div>
+          <h3>Humidity</h3>
+          <ReactApexChart
+            // @ts-ignore
+            options={chartOptions}
+            series={[{ name: "Humidity", data: chartData.Humidity }]}
+            type="line"
+            width={"100%"}
+          />
+        </div>
+        <div>
           <h3>Soil Moisture</h3>
           <ReactApexChart
             // @ts-ignore
@@ -234,16 +245,6 @@ function Home() {
             series={[
               { name: "Light Intensity", data: chartData.LightIntensity },
             ]}
-            type="line"
-            width={"100%"}
-          />
-        </div>
-        <div>
-          <h3>Humidity</h3>
-          <ReactApexChart
-            // @ts-ignore
-            options={chartOptions}
-            series={[{ name: "Humidity", data: chartData.Humidity }]}
             type="line"
             width={"100%"}
           />
